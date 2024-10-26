@@ -15,9 +15,9 @@ private struct QuizStepViewModel {
 
 // состояние - результат квиза
 private struct QuizResultsViewModel {
-  let title: String
-  let text: String
-  let buttonText: String
+    let title: String
+    let text: String
+    let buttonText: String
 }
 
 final class MovieQuizViewController: UIViewController {
@@ -76,10 +76,9 @@ final class MovieQuizViewController: UIViewController {
     @IBOutlet private var counterLabel: UILabel!
     
     override func viewDidLoad() {
+        super.viewDidLoad()
         show(quiz: convert(model: questions[currentQuestionIndex]))
         imageView.layer.cornerRadius = 20
-        super.viewDidLoad()
-        
     }
     
     // функци конвертирвания данных
@@ -159,12 +158,12 @@ final class MovieQuizViewController: UIViewController {
                                                  buttonText: "Сыграть еще раз")
             show(quiz: viewModel)
         } else {
-                currentQuestionIndex += 1
+            currentQuestionIndex += 1
                 
-                let nextQuestion = questions[currentQuestionIndex]
-                let viewModel = convert(model: nextQuestion)
+            let nextQuestion = questions[currentQuestionIndex]
+            let viewModel = convert(model: nextQuestion)
                 
-                show(quiz: viewModel)
+            show(quiz: viewModel)
         }
     }
 }
