@@ -2,7 +2,7 @@
 //  AlertPresenter.swift
 //  MovieQuiz
 //
-//  Created by Никита Нагорный on 13.11.2024.
+//  Created by Никита Нагорный on 14.11.2024.
 //
 
 import UIKit
@@ -15,7 +15,7 @@ class AlertPresenter {
             preferredStyle: .alert)
         
         let action = UIAlertAction(title: model.buttonText, style: .default) { _ in
-            model.completion?()
+            model.comletion?()
         }
         
         alert.addAction(action)
@@ -23,4 +23,3 @@ class AlertPresenter {
         view.present(alert, animated: true, completion: nil)
     }
 }
-

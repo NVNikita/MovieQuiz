@@ -12,17 +12,22 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private var questionFactory: QuestionFactoryProtocol?
     //вопрос который видит пользователь
     private var currentQuestion: QuizQuestion?
-    // alert
+    
+    // класс алерта
     private var alertPresenter: AlertPresenter?
+    // класс статистики
+    private var statisticService: StatisticService?
     
     @IBOutlet private var imageView: UIImageView!
     @IBOutlet private var textLabel: UILabel!
     @IBOutlet private var counterLabel: UILabel!
     
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         alertPresenter = AlertPresenter()
+        statisticService = StatisticService()
         
         let questionFactory = QuestionFactory()
         questionFactory.setup(delegate: self)
@@ -31,8 +36,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         imageView.layer.cornerRadius = 20
     }
     
-    // MARK: - QuestionFactoryDelegate
-
+    // обрашаемся к методу фабрики вопросов для генерации вопросов
     func didReceiveNextQuestion(question: QuizQuestion?) {
         guard let question = question else {
             return
@@ -62,40 +66,33 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         counterLabel.text = step.questionNumber
     }
     
-    /*private func show(quiz result: QuizResultsViewModel) {
-        let alert = UIAlertController(
-            title: result.title,
-            message: result.text,
-            preferredStyle: .alert)
-        
-        let action = UIAlertAction(title: result.buttonText, style: .default) { [ weak self ] _ in
-            guard let self = self else { return }
-            self.currentQuestionIndex = 0
-            self.correctAnswers = 0
-            
-            questionFactory?.requestNextQuestion() 
-        }
-        
-        alert.addAction(action)
-        
-        self.present(alert, animated: true, completion: nil)
-    }*/
-    
+    // показ финального алерта
     private func alertFinal( rezult: QuizResultsViewModel) {
+        guard let statisticService = statisticService else { return }
         
-        let message = "Ваш счет: \(correctAnswers)/\(questionsAmount)"
+        // обновляем статистику
+        statisticService.store(correct: correctAnswers, total: questionsAmount)
         
-        let alertModel = AlertModel (
-                    title: "Этот раунд окончен!",
-                    message: message,
-                    buttonText: "Сыграть еще раз",
-                    completion: { [weak self] in
-                        guard let self = self else { return }
-                        self.currentQuestionIndex = 0
-                        self.correctAnswers = 0
-                        questionFactory?.requestNextQuestion()
-                    }
-        )
+        let bestGame = statisticService.bestGame
+        let gamesCount = statisticService.gamesCount
+        let totalAccuracy = String(format: "%.2f", statisticService.totalAccuracy)
+
+        let message = """
+        Ваш результат: \(correctAnswers)/\(questionsAmount)\n
+        Количество сыгранных квизов: \(gamesCount)\n
+        Рекорд: \(bestGame.correct)/\(bestGame.total) (\(bestGame.date.dateTimeString))\n
+        Средняя точность: \(totalAccuracy)%
+        """
+        
+        let alertModel = AlertModel(title: "Раунд окончен",
+                                    message: message,
+                                    buttonText: "Сыграть еще раз",
+                                    comletion: { [ weak self ] in
+                                        guard let self = self else { return }
+                                        self.currentQuestionIndex = 0
+                                        self.correctAnswers = 0
+                                        questionFactory?.requestNextQuestion()
+        })
         
         alertPresenter?.showAlert(view: self, model: alertModel)
     }
