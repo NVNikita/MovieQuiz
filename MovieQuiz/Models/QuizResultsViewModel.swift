@@ -2,7 +2,6 @@
 //  QuizResultsViewModel.swift
 //  MovieQuiz
 //
-//  Created by Никита Нагорный on 12.11.2024.
 //
 
 import UIKit

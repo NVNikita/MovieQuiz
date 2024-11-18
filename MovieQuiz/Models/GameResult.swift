@@ -2,7 +2,6 @@
 //  GameResult.swift
 //  MovieQuiz
 //
-//  Created by Никита Нагорный on 16.11.2024.
 //
 
 import UIKit

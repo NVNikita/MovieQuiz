@@ -2,15 +2,14 @@
 //  StatisticServiceProtocol.swift
 //  MovieQuiz
 //
-//  Created by Никита Нагорный on 16.11.2024.
 //
 
 import UIKit
 
 protocol StatisticServiceProtocol {
-    var gamesCount: Int { get } 
-    var bestGame: GameResult { get }
     var totalAccuracy: Double { get }
+    var gamesCount: Int { get set }
+    var bestGame: GameResult { get }
     
     func store(correct count: Int, total amount: Int)
 }

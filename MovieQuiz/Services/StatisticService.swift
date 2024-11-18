@@ -1,76 +1,67 @@
-//
-//  StatisticService.swift
-//  MovieQuiz
-//
-//  Created by Никита Нагорный on 16.11.2024.
-//
-
-
-//UIKit содежит Foundation - поэтому везде импортирую эту библу в проекте
 import UIKit
 
 final class StatisticService: StatisticServiceProtocol {
-    // сокращение для читаемости и упрощения кода (убрали дублирование кода)
+    
     private let storage: UserDefaults = .standard
     
-    // создали энумчики для ключей что бы избежать опечаток при записи/чтении
     private enum Keys: String {
-        case gamesCount
-        case correctAnswersBest
-        case totalQuestionsBest
-        case dataGameBest
-        case correctAnswers
-        case totalQuestions
+        case countGames
+        case correctBest
+        case totalBest
+        case bestGameDate
+        case allCorrectAnswers
+        case allTotalQuestions
+    }
+    
+    var totalAccuracy: Double {
+        let correctAnswers = storage.integer(forKey: "allCorrectAnswers")
+        
+        guard correctAnswers != 0 else { return 0 }
+        
+        return Double(correctAnswers) / Double(gamesCount * 10) * 100.0
     }
     
     var gamesCount: Int {
-        get {return storage.integer(forKey: Keys.gamesCount.rawValue)}
-        set {storage.set(newValue, forKey: Keys.gamesCount.rawValue)}
+        get { storage.integer(forKey: Keys.countGames.rawValue) }
+        set { storage.set(newValue, forKey: Keys.countGames.rawValue) }
     }
     
     var bestGame: GameResult {
         get {
-            let correctAnswers = storage.integer(forKey: Keys.correctAnswersBest.rawValue)
-            let totalQuestions = storage.integer(forKey: Keys.totalQuestionsBest.rawValue)
-            // распакововываем дату
-            let dateGameBest = storage.object(forKey: Keys.dataGameBest.rawValue) as? Date ?? Date()
+            let correctAnswers = storage.integer(forKey: Keys.correctBest.rawValue)
+            let totalQuestions = storage.integer(forKey: Keys.totalBest.rawValue)
+            let dateGame = storage.object(forKey: Keys.bestGameDate.rawValue) as? Date ?? Date()
             
-            return GameResult(correct: correctAnswers, total: totalQuestions, date: dateGameBest)
+            return GameResult(correct: correctAnswers, total: totalQuestions, date: dateGame)
         }
         set {
-            storage.set(newValue, forKey: Keys.correctAnswersBest.rawValue)
-            storage.set(newValue, forKey: Keys.totalQuestionsBest.rawValue)
-            storage.set(newValue, forKey: Keys.dataGameBest.rawValue)
+            storage.set(newValue, forKey: Keys.correctBest.rawValue)
+            storage.set(newValue, forKey: Keys.totalBest.rawValue)
+            storage.set(newValue, forKey: Keys.bestGameDate.rawValue)
         }
-    }
-    
-    var totalAccuracy: Double{
-        let correctAnswers = storage.integer(forKey: Keys.correctAnswers.rawValue)
-        let totalQuestions = storage.integer(forKey: Keys.totalQuestions.rawValue)
-        
-        // проерка на 0 (избежания краша при делении на 0)
-        guard totalQuestions > 0 else { return 0 }
-        
-        return Double((correctAnswers / (gamesCount * 10)) * 100)
     }
     
     func store(correct count: Int, total amount: Int) {
+        // счетчик игр +1
         gamesCount += 1
         
-        // получиили кол-во правильных вопросов и ответои и обновили
-        let updateCorrectQuestions = storage.integer(forKey: Keys.correctAnswers.rawValue) + count
-        let updateTotalQuestions = storage.integer(forKey: Keys.totalQuestions.rawValue) + amount
+        // получили данные
+        let newAllCorrectAnswers = storage.integer(forKey: Keys.allCorrectAnswers.rawValue) + count
+        let newAllTotalQuestions = storage.integer(forKey: Keys.allTotalQuestions.rawValue) + amount
+        let timeGame = storage.object(forKey: Keys.bestGameDate.rawValue) as? Date ?? Date()
         
-        // перезаписали новые данные в память
-        storage.set(updateCorrectQuestions, forKey: Keys.correctAnswers.rawValue)
-        storage.set(updateTotalQuestions, forKey: Keys.totalQuestions.rawValue)
+        //перезаписали данные
+        storage.set(newAllCorrectAnswers, forKey: Keys.allCorrectAnswers.rawValue)
+        storage.set(newAllTotalQuestions, forKey: Keys.allTotalQuestions.rawValue)
         
-        // проверка на получение лучшего результата c последующей записью в память
+        // сравниваем лучший результат и записываем новые, если результат лучше рекорда
         let game = GameResult(correct: count, total: amount, date: Date())
-        if game.isRecord(bestGame) { bestGame = game }
+        if game.isRecord(bestGame) {
+            storage.set(count, forKey: Keys.correctBest.rawValue)
+            storage.set(amount, forKey: Keys.totalBest.rawValue)
+            storage.set(timeGame, forKey: Keys.bestGameDate.rawValue)
+        }
     }
     
     
 }
-
-

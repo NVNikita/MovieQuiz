@@ -2,7 +2,6 @@
 //  AlertPresenter.swift
 //  MovieQuiz
 //
-//  Created by Никита Нагорный on 14.11.2024.
 //
 
 import UIKit
