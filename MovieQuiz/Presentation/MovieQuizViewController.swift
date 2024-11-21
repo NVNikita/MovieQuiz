@@ -2,6 +2,10 @@ import UIKit
 
 final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
+    @IBOutlet private var imageView: UIImageView!
+    @IBOutlet private var textLabel: UILabel!
+    @IBOutlet private var counterLabel: UILabel!
+    
     //фабрика вопросов
     private var questionFactory: QuestionFactoryProtocol?
     //вопрос который видит пользователь
@@ -18,10 +22,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private var correctAnswers: Int = 0
     //общее количество вопросов для квиза
     private let questionsAmount: Int = 10
-    
-    @IBOutlet private var imageView: UIImageView!
-    @IBOutlet private var textLabel: UILabel!
-    @IBOutlet private var counterLabel: UILabel!
     
     
     override func viewDidLoad() {
@@ -68,7 +68,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     // показ финального алерта
-    private func alertFinal(_ rezult: QuizResultsViewModel) {
+    private func alertFinal() {
         guard let statisticService = statisticService else { return }
         
         //данные в статиксервис для обновления данных и вычисления лучшего результата
@@ -81,9 +81,9 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         let totalAccuracy = "\(String(format: "%.2f", statisticService.totalAccuracy))%"
         
         let message = """
-        Ваш результат: \(correctAnswers)/\(questionsAmount)\n
-        Количество сыгранных игр: \(gameCount)\n
-        Рекорд: \(bestGame.correct)/\(bestGame.total) (\(timeRecord.dateTimeString))\n
+        Ваш результат: \(correctAnswers)/\(questionsAmount)
+        Количество сыгранных игр: \(gameCount)
+        Рекорд: \(bestGame.correct)/\(bestGame.total) (\(timeRecord.dateTimeString))
         Средняя точность: \(totalAccuracy)
         """
         
@@ -118,6 +118,18 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         
     }
     
+    // функция переключения состояний
+    private func showNextQuestionOrResults() {
+        imageView.layer.borderWidth = 0
+        if currentQuestionIndex == questionsAmount - 1 {
+            alertFinal()
+        } else {
+            currentQuestionIndex += 1
+                
+            questionFactory?.requestNextQuestion()
+        }
+    }
+    
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
         guard let currentQuestion = currentQuestion else {
             return
@@ -135,22 +147,4 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
     
-    // функция переключения состояний
-    private func showNextQuestionOrResults() {
-        imageView.layer.borderWidth = 0
-        if currentQuestionIndex == questionsAmount - 1 {
-            let text = correctAnswers == questionsAmount ?
-                    "Поздравляем, вы ответили на 10 из 10!" :
-                    "Вы ответили на \(correctAnswers) из 10, попробуйте ещё раз!"
-            let viewModel = QuizResultsViewModel(title: "Этот раунд окончен!",
-                                                 text: text,
-                                                 buttonText: "Сыграть еще раз")
-            
-            alertFinal(viewModel)
-        } else {
-            currentQuestionIndex += 1
-                
-            self.questionFactory?.requestNextQuestion()
-        }
-    }
 }
