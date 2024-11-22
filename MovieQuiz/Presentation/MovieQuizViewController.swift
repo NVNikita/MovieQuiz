@@ -23,9 +23,12 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     //общее количество вопросов для квиза
     private let questionsAmount: Int = 10
     
-    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        var preferredStatusBarStyle: UIStatusBarStyle {
+            return .lightContent
+        }
         
         statisticService = StatisticService()
         alertPresenter = AlertPresenter()
@@ -35,6 +38,11 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         self.questionFactory = questionFactory
         questionFactory.requestNextQuestion()
         imageView.layer.cornerRadius = 20
+    }
+    
+    // статус бар
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
     }
     
     // обрашаемся к методу фабрики вопросов для генерации вопросов
