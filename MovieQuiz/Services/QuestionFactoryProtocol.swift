@@ -1,0 +1,11 @@
+//
+//  QuestionFactoryProtocol.swift
+//  MovieQuiz
+//
+//
+
+import UIKit
+
+protocol QuestionFactoryProtocol {
+    func requestNextQuestion()
+}
