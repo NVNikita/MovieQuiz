@@ -2,8 +2,9 @@ import UIKit
 
 final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
-    @IBOutlet weak var yesButton: UIButton!
-    @IBOutlet weak var noButton: UIButton!
+    @IBOutlet private var activityIndicator: UIActivityIndicatorView!
+    @IBOutlet private var yesButton: UIButton!
+    @IBOutlet private var noButton: UIButton!
     @IBOutlet private var imageView: UIImageView!
     @IBOutlet private var textLabel: UILabel!
     @IBOutlet private var counterLabel: UILabel!
@@ -136,6 +137,29 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
                 
             questionFactory?.requestNextQuestion()
         }
+    }
+    
+    // функция включения индикатора загрузки
+    private func showLoadingIndicator() {
+        activityIndicator.isHidden = false
+        activityIndicator.startAnimating()
+    }
+    
+    // ффункция показа алерта ошибки
+    private func showNetworkError( message: String) {
+        hideLoadingIndicator()
+        
+        let alertErrorModel = AlertModel(title: "Ошибка",
+                                         message: message,
+                                         buttonText: "Попробовать еще раз",
+                                         comletion: { [ weak self ] in
+                                         guard let self = self else { return }
+                                         self.correctAnswers = 0
+                                         self.currentQuestionIndex = 0
+                                         questionFactory?.requestNextQuestion()
+        })
+        
+        alertPresenter?.showAlert(view: self, model: alertErrorModel)
     }
     
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
