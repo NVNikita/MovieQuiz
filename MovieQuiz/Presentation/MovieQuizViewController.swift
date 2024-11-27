@@ -29,14 +29,14 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        imageView.layer.cornerRadius = 20
         statisticService = StatisticService()
         alertPresenter = AlertPresenter()
+        questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
         
-        let questionFactory = QuestionFactory()
-        questionFactory.setup(delegate: self)
-        self.questionFactory = questionFactory
-        questionFactory.requestNextQuestion()
-        imageView.layer.cornerRadius = 20
+        showLoadingIndicator()
+        questionFactory?.loadData()
+        
     }
     
     // статус бар
@@ -61,7 +61,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     // функци конвертирвания данных
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
         let questionStep = QuizStepViewModel(
-            image: UIImage(named: model.image) ?? UIImage(),
+            image: UIImage(data: model.image) ?? UIImage(),
+            //image: UIImage(data: model.image) ?? UIImage(),
             question: model.text,
             questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
         return questionStep
@@ -145,9 +146,9 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         activityIndicator.startAnimating()
     }
     
-    // ффункция показа алерта ошибки
+    // функция показа алерта ошибки
     private func showNetworkError( message: String) {
-        hideLoadingIndicator()
+        //hideLoadingIndicator()
         
         let alertErrorModel = AlertModel(title: "Ошибка",
                                          message: message,
@@ -160,6 +161,16 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         })
         
         alertPresenter?.showAlert(view: self, model: alertErrorModel)
+    }
+    
+    func didLoadDataFromServer() {
+        activityIndicator.isHidden = true
+        questionFactory?.requestNextQuestion()
+    }
+    
+    // перевод экрана в состояние ошибки
+    func didFailToLoadData(with error: Error) {
+        showNetworkError(message: error.localizedDescription)
     }
     
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
