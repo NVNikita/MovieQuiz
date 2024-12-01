@@ -2,11 +2,16 @@ import UIKit
 
 final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
-    @IBOutlet weak var yesButton: UIButton!
-    @IBOutlet weak var noButton: UIButton!
+    // MARK: - IB0utlets
+    
+    @IBOutlet private var activityIndicator: UIActivityIndicatorView!
+    @IBOutlet private var yesButton: UIButton!
+    @IBOutlet private var noButton: UIButton!
     @IBOutlet private var imageView: UIImageView!
     @IBOutlet private var textLabel: UILabel!
     @IBOutlet private var counterLabel: UILabel!
+    
+    // MARK: - Private Properties
     
     //фабрика вопросов
     private var questionFactory: QuestionFactoryProtocol?
@@ -25,23 +30,28 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     //общее количество вопросов для квиза
     private let questionsAmount: Int = 10
     
+    // MARK: - Lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        imageView.layer.cornerRadius = 20
+        showLoadingIndicator()
+        
         statisticService = StatisticService()
         alertPresenter = AlertPresenter()
+        questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
         
-        let questionFactory = QuestionFactory()
-        questionFactory.setup(delegate: self)
-        self.questionFactory = questionFactory
-        questionFactory.requestNextQuestion()
-        imageView.layer.cornerRadius = 20
+        questionFactory?.loadData()
+        
     }
     
     // статус бар
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
     }
+    
+    // MARK: - Public Methods
     
     // обрашаемся к методу фабрики вопросов для генерации вопросов
     func didReceiveNextQuestion(question: QuizQuestion?) {
@@ -57,10 +67,23 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
     }
     
+    // обращение к методу для генерации вопроса
+    func didLoadDataFromServer() {
+        activityIndicator.isHidden = true
+        questionFactory?.requestNextQuestion()
+    }
+    
+    // перевод экрана в состояние ошибки
+    func didFailToLoadData(with error: Error) {
+        showNetworkError(message: error.localizedDescription)
+    }
+    
+    // MARK: - Private Methods
+    
     // функци конвертирвания данных
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
         let questionStep = QuizStepViewModel(
-            image: UIImage(named: model.image) ?? UIImage(),
+            image: UIImage(data: model.image) ?? UIImage(),
             question: model.text,
             questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
         return questionStep
@@ -68,6 +91,10 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     // функция показа данных на экран
     private func show(quiz step: QuizStepViewModel) {
+        // делаем кнопки активными
+        noButton.isEnabled = true
+        yesButton.isEnabled = true
+        
         imageView.image = step.image
         textLabel.text = step.question
         counterLabel.text = step.questionNumber
@@ -120,8 +147,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self else { return }
             self.showNextQuestionOrResults()
-            yesButton.isEnabled = true
-            noButton.isEnabled = true
         }
         
     }
@@ -138,8 +163,35 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
     }
     
+    // функция включения индикатора загрузки
+    private func showLoadingIndicator() {
+        activityIndicator.isHidden = false
+        activityIndicator.startAnimating()
+    }
+    
+    // функция показа алерта ошибки
+    private func showNetworkError( message: String) {
+        
+        let alertErrorModel = AlertModel(title: "Ошибка",
+                                         message: message,
+                                         buttonText: "Попробовать еще раз",
+                                         comletion: { [ weak self ] in
+                                         guard let self = self else { return }
+                                         self.correctAnswers = 0
+                                         self.currentQuestionIndex = 0
+                                         questionFactory?.requestNextQuestion()
+        })
+        
+        alertPresenter?.showAlert(view: self, model: alertErrorModel)
+    }
+    
+    // MARK: - IBActions
+    
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
+        //делаем кнопки неактивными до показа след вопроса
+        noButton.isEnabled = false
         yesButton.isEnabled = false
+        
         guard let currentQuestion = currentQuestion else {
             return
         }
@@ -148,7 +200,10 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     @IBAction private func noButtonClicked(_ sender: UIButton) {
+        //делаем кнопки неактивными до показа след вопроса
         noButton.isEnabled = false
+        yesButton.isEnabled = false
+        
         guard let currentQuestion = currentQuestion else {
             return
         }
