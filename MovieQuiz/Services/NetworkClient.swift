@@ -6,7 +6,7 @@
 
 import UIKit
 
-struct NetworkClient {
+class NetworkClient {
 
     private enum NetworkError: Error {
         case codeError
