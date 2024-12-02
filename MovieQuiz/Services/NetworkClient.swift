@@ -6,7 +6,11 @@
 
 import UIKit
 
-class NetworkClient {
+protocol NetworkRouting {
+    func fetch(url: URL, handler: @escaping (Result<Data, Error>) -> Void)
+}
+
+class NetworkClient: NetworkRouting {
 
     private enum NetworkError: Error {
         case codeError
