@@ -120,7 +120,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         Средняя точность: \(totalAccuracy)
         """
         
-        let alertModel = AlertModel(title: "Раунд окончен",
+        let alertModel = AlertModel(title: "Этот раунд окончен!",
                                     message: message,
                                     buttonText: "Сыграть еще раз",
                                     comletion: { [ weak self ] in
