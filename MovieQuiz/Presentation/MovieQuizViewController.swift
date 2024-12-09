@@ -19,8 +19,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private var alertPresenter: AlertPresenter?
     // класс статиксервиса
     private var statisticService: StatisticService?
-    // счетчик правильных ответов
-    private var correctAnswers: Int = 0
+    // класс презентер
     private let presenter = MovieQuizPresenter()
     
     // MARK: - Lifecycle
@@ -81,7 +80,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         guard let statisticService = statisticService else { return }
         
         //данные в статиксервис для обновления данных и вычисления лучшего результата
-        statisticService.store(correct: correctAnswers, total: presenter.questionsAmount)
+        statisticService.store(correct: presenter.correctAnswers, total: presenter.questionsAmount)
         
         // данные в алерт для показа
         let gameCount = statisticService.gamesCount
@@ -90,7 +89,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         let totalAccuracy = "\(String(format: "%.2f", statisticService.totalAccuracy))%"
         
         let message = """
-        Ваш результат: \(correctAnswers)/\(presenter.questionsAmount)
+        Ваш результат: \(presenter.correctAnswers)/\(presenter.questionsAmount)
         Количество сыгранных игр: \(gameCount)
         Рекорд: \(bestGame.correct)/\(bestGame.total) (\(timeRecord.dateTimeString))
         Средняя точность: \(totalAccuracy)
@@ -101,8 +100,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
                                     buttonText: "Сыграть еще раз",
                                     comletion: { [ weak self ] in
                                         guard let self = self else { return }
-                                        self.presenter.resetQuestionIndex()
-                                        self.correctAnswers = 0
+                                        self.presenter.restartGame()
                                         questionFactory?.requestNextQuestion()
         })
         
@@ -111,9 +109,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     // функция покраски рамки взависимости от ответа юзера
     func showAnswerResult(isCorrect: Bool) {
-        if isCorrect {
-            correctAnswers += 1
-        }
+        presenter.didAnswer(isCorrectAnswer: isCorrect)
         
         imageView.layer.masksToBounds = true
         imageView.layer.cornerRadius = 20
@@ -122,7 +118,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self else { return }
-            self.presenter.correctAnswers = self.correctAnswers
             self.presenter.questionFactory = self.questionFactory
             self.presenter.showNextQuestionOrResults()
         }
@@ -148,8 +143,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
                                          buttonText: "Попробовать еще раз",
                                          comletion: { [ weak self ] in
                                          guard let self = self else { return }
-                                         self.correctAnswers = 0
-                                         self.presenter.resetQuestionIndex()
+                                         self.presenter.restartGame()
                                          questionFactory?.requestNextQuestion()
         })
         

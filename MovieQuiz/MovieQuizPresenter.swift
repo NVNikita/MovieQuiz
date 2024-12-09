@@ -10,6 +10,7 @@ final class MovieQuizPresenter {
     var currentQuestion: QuizQuestion?
     weak var viewController: MovieQuizViewController?
     var questionFactory: QuestionFactoryProtocol?
+    
     //общее количество вопросов для квиза
     let questionsAmount: Int = 10
     // счетчик вопросов
@@ -20,8 +21,9 @@ final class MovieQuizPresenter {
         currentQuestionIndex == questionsAmount - 1
     }
     
-    func resetQuestionIndex() {
+    func restartGame() {
         currentQuestionIndex = 0
+        correctAnswers = 0
     }
     
     func switchToNextQuestion() {
@@ -45,7 +47,14 @@ final class MovieQuizPresenter {
         didAnswer(isYes: false)
     }
     
+    func didAnswer(isCorrectAnswer: Bool) {
+        if isCorrectAnswer {
+            correctAnswers += 1
+        }
+    }
+    
     private func didAnswer(isYes: Bool) {
+        
         guard let currentQuestion = currentQuestion else {
             return
         }
