@@ -15,9 +15,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     //фабрика вопросов
     private var questionFactory: QuestionFactoryProtocol?
-    //вопрос который видит пользователь
-    private var currentQuestion: QuizQuestion?
-    
     // класс алерта
     private var alertPresenter: AlertPresenter?
     // класс статиксервиса
@@ -52,16 +49,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     // обрашаемся к методу фабрики вопросов для генерации вопросов
     func didReceiveNextQuestion(question: QuizQuestion?) {
-        guard let question = question else {
-            return
-        }
-
-        currentQuestion = question
-        let viewModel = presenter.convert(model: question)
-        
-        DispatchQueue.main.async { [weak self] in
-            self?.show(quiz: viewModel)
-        }
+        presenter.didReceiveNextQuestion(question: question)
     }
     
     // обращение к методу для генерации вопроса
@@ -78,7 +66,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     // MARK: - Private Methods
     
     // функция показа данных на экран
-    private func show(quiz step: QuizStepViewModel) {
+    func show(quiz step: QuizStepViewModel) {
         // делаем кнопки активными
         noButton.isEnabled = true
         yesButton.isEnabled = true
@@ -185,7 +173,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         noButton.isEnabled = false
         yesButton.isEnabled = false
         
-        presenter.currentQuestion = currentQuestion
         presenter.yesButtonClicked()
     }
     
@@ -194,7 +181,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         noButton.isEnabled = false
         yesButton.isEnabled = false
         
-        presenter.currentQuestion = currentQuestion
         presenter.noButtonClicked()
     }
 }
