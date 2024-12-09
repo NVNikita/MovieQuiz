@@ -35,6 +35,7 @@
 		EBD5E1742CE3BF3A00694538 /* QuizQuestion.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBD5E1732CE3BF3A00694538 /* QuizQuestion.swift */; };
 		EBDA09BF2CC2E94C0042E093 /* YS Display-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = EBDA09BD2CC2E94C0042E093 /* YS Display-Medium.ttf */; };
 		EBDA09C02CC2E94C0042E093 /* YS Display-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = EBDA09BE2CC2E94C0042E093 /* YS Display-Bold.ttf */; };
+		EBE9BA3B2D06652400FFE053 /* MovieQuizPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBE9BA3A2D06652400FFE053 /* MovieQuizPresenter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -88,6 +89,7 @@
 		EBD5E1732CE3BF3A00694538 /* QuizQuestion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizQuestion.swift; sourceTree = "<group>"; };
 		EBDA09BD2CC2E94C0042E093 /* YS Display-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "YS Display-Medium.ttf"; sourceTree = "<group>"; };
 		EBDA09BE2CC2E94C0042E093 /* YS Display-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "YS Display-Bold.ttf"; sourceTree = "<group>"; };
+		EBE9BA3A2D06652400FFE053 /* MovieQuizPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieQuizPresenter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -180,6 +182,7 @@
 				ADF0CF75283FDAA10075F54D /* Helpers */,
 				611342392B701CF6003FC2A4 /* Models */,
 				8F4738332848DE46005DF65E /* Resources */,
+				EBE9BA3A2D06652400FFE053 /* MovieQuizPresenter.swift */,
 			);
 			path = MovieQuiz;
 			sourceTree = "<group>";
@@ -374,6 +377,7 @@
 				AD1ABAB62831907B00B3E448 /* MovieQuizViewController.swift in Sources */,
 				EBD5E1702CE3BF0F00694538 /* QuizStepViewModel.swift in Sources */,
 				EBD5E1742CE3BF3A00694538 /* QuizQuestion.swift in Sources */,
+				EBE9BA3B2D06652400FFE053 /* MovieQuizPresenter.swift in Sources */,
 				EB0816102CE803D9000FE953 /* StatisticServiceProtocol.swift in Sources */,
 				EBD5E16E2CE3B4CE00694538 /* QuestionFactory.swift in Sources */,
 				AD77F5742857F8810062FB14 /* Date+Extensions.swift in Sources */,

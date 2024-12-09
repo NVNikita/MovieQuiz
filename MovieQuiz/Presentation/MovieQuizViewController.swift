@@ -22,13 +22,9 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private var alertPresenter: AlertPresenter?
     // класс статиксервиса
     private var statisticService: StatisticService?
-    
-    // счетчик вопросов
-    private var currentQuestionIndex: Int = 0
     // счетчик правильных ответов
     private var correctAnswers: Int = 0
-    //общее количество вопросов для квиза
-    private let questionsAmount: Int = 10
+    private let presenter = MovieQuizPresenter()
     
     // MARK: - Lifecycle
     
@@ -60,7 +56,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
 
         currentQuestion = question
-        let viewModel = convert(model: question)
+        let viewModel = presenter.convert(model: question)
         
         DispatchQueue.main.async { [weak self] in
             self?.show(quiz: viewModel)
@@ -80,15 +76,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     // MARK: - Private Methods
     
-    // функци конвертирвания данных
-    private func convert(model: QuizQuestion) -> QuizStepViewModel {
-        let questionStep = QuizStepViewModel(
-            image: UIImage(data: model.image) ?? UIImage(),
-            question: model.text,
-            questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
-        return questionStep
-    }
-    
     // функция показа данных на экран
     private func show(quiz step: QuizStepViewModel) {
         // делаем кнопки активными
@@ -105,7 +92,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         guard let statisticService = statisticService else { return }
         
         //данные в статиксервис для обновления данных и вычисления лучшего результата
-        statisticService.store(correct: correctAnswers, total: questionsAmount)
+        statisticService.store(correct: correctAnswers, total: presenter.questionsAmount)
         
         // данные в алерт для показа
         let gameCount = statisticService.gamesCount
@@ -114,7 +101,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         let totalAccuracy = "\(String(format: "%.2f", statisticService.totalAccuracy))%"
         
         let message = """
-        Ваш результат: \(correctAnswers)/\(questionsAmount)
+        Ваш результат: \(correctAnswers)/\(presenter.questionsAmount)
         Количество сыгранных игр: \(gameCount)
         Рекорд: \(bestGame.correct)/\(bestGame.total) (\(timeRecord.dateTimeString))
         Средняя точность: \(totalAccuracy)
@@ -125,7 +112,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
                                     buttonText: "Сыграть еще раз",
                                     comletion: { [ weak self ] in
                                         guard let self = self else { return }
-                                        self.currentQuestionIndex = 0
+                                        self.presenter.resetQuestionIndex()
                                         self.correctAnswers = 0
                                         questionFactory?.requestNextQuestion()
         })
@@ -154,10 +141,10 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     // функция переключения состояний
     private func showNextQuestionOrResults() {
         imageView.layer.borderWidth = 0
-        if currentQuestionIndex == questionsAmount - 1 {
+        if presenter.isLastQuestion() {
             alertFinal()
         } else {
-            currentQuestionIndex += 1
+            presenter.switchToNextQuestion()
                 
             questionFactory?.requestNextQuestion()
         }
@@ -169,8 +156,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         activityIndicator.startAnimating()
     }
     
+    private func hideLoadingIndicator() {
+        activityIndicator.isHidden = true
+    }
+    
     // функция показа алерта ошибки
     private func showNetworkError( message: String) {
+        hideLoadingIndicator()
         
         let alertErrorModel = AlertModel(title: "Ошибка",
                                          message: message,
@@ -178,7 +170,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
                                          comletion: { [ weak self ] in
                                          guard let self = self else { return }
                                          self.correctAnswers = 0
-                                         self.currentQuestionIndex = 0
+                                         self.presenter.resetQuestionIndex()
                                          questionFactory?.requestNextQuestion()
         })
         
