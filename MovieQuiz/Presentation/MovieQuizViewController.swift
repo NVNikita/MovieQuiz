@@ -1,6 +1,6 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController {
+final class MovieQuizViewController: UIViewController, MovieQuizViewControllerProtocol {
     
     // MARK: - IB0utlets
     
@@ -84,7 +84,7 @@ final class MovieQuizViewController: UIViewController {
     }
     
     // функция показа алерта ошибки
-    func showNetworkError( message: String) {
+    func showNetworkError(message: String) {
         hideLoadingIndicator()
         
         let alertErrorModel = AlertModel(title: "Ошибка",
