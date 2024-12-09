@@ -7,7 +7,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBOutlet private var activityIndicator: UIActivityIndicatorView!
     @IBOutlet private var yesButton: UIButton!
     @IBOutlet private var noButton: UIButton!
-    @IBOutlet private var imageView: UIImageView!
+    @IBOutlet var imageView: UIImageView!
     @IBOutlet private var textLabel: UILabel!
     @IBOutlet private var counterLabel: UILabel!
     
@@ -77,7 +77,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     // показ финального алерта
-    private func alertFinal() {
+    func alertFinal() {
         guard let statisticService = statisticService else { return }
         
         //данные в статиксервис для обновления данных и вычисления лучшего результата
@@ -122,21 +122,11 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self else { return }
-            self.showNextQuestionOrResults()
+            self.presenter.correctAnswers = self.correctAnswers
+            self.presenter.questionFactory = self.questionFactory
+            self.presenter.showNextQuestionOrResults()
         }
         
-    }
-    
-    // функция переключения состояний
-    private func showNextQuestionOrResults() {
-        imageView.layer.borderWidth = 0
-        if presenter.isLastQuestion() {
-            alertFinal()
-        } else {
-            presenter.switchToNextQuestion()
-                
-            questionFactory?.requestNextQuestion()
-        }
     }
     
     // функция включения индикатора загрузки

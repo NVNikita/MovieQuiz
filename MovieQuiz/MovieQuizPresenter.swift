@@ -9,10 +9,12 @@ final class MovieQuizPresenter {
     
     var currentQuestion: QuizQuestion?
     weak var viewController: MovieQuizViewController?
+    var questionFactory: QuestionFactoryProtocol?
     //общее количество вопросов для квиза
     let questionsAmount: Int = 10
     // счетчик вопросов
     private var currentQuestionIndex: Int = 0
+    var correctAnswers: Int = 0
     
     func isLastQuestion() -> Bool {
         currentQuestionIndex == questionsAmount - 1
@@ -62,6 +64,17 @@ final class MovieQuizPresenter {
         
         DispatchQueue.main.async { [weak self] in
             self?.viewController?.show(quiz: viewModel)
+        }
+    }
+    
+    // функция переключения состояний
+    func showNextQuestionOrResults() {
+        viewController?.imageView.layer.borderWidth = 0
+        if self.isLastQuestion() {
+            viewController?.alertFinal()
+        } else {
+            self.switchToNextQuestion()
+            questionFactory?.requestNextQuestion()
         }
     }
 }
