@@ -136,6 +136,7 @@
 				AD1ABAB52831907B00B3E448 /* MovieQuizViewController.swift */,
 				AD1ABAB72831907B00B3E448 /* Main.storyboard */,
 				EB0A692E2CE577B800D9E214 /* AlertPresenter.swift */,
+				EBE9BA3A2D06652400FFE053 /* MovieQuizPresenter.swift */,
 			);
 			path = Presentation;
 			sourceTree = "<group>";
@@ -182,7 +183,6 @@
 				ADF0CF75283FDAA10075F54D /* Helpers */,
 				611342392B701CF6003FC2A4 /* Models */,
 				8F4738332848DE46005DF65E /* Resources */,
-				EBE9BA3A2D06652400FFE053 /* MovieQuizPresenter.swift */,
 			);
 			path = MovieQuiz;
 			sourceTree = "<group>";

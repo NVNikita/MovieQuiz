@@ -1,26 +1,24 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
+final class MovieQuizViewController: UIViewController {
     
     // MARK: - IB0utlets
     
     @IBOutlet private var activityIndicator: UIActivityIndicatorView!
     @IBOutlet private var yesButton: UIButton!
     @IBOutlet private var noButton: UIButton!
-    @IBOutlet var imageView: UIImageView!
+    @IBOutlet var imageView: UIImageView! // исправь исправь исправь !!!!!!!!!!!!!!!!
     @IBOutlet private var textLabel: UILabel!
     @IBOutlet private var counterLabel: UILabel!
     
     // MARK: - Private Properties
     
-    //фабрика вопросов
-    private var questionFactory: QuestionFactoryProtocol?
     // класс алерта
     private var alertPresenter: AlertPresenter?
     // класс статиксервиса
     private var statisticService: StatisticService?
     // класс презентер
-    private let presenter = MovieQuizPresenter()
+    private var presenter: MovieQuizPresenter!
     
     // MARK: - Lifecycle
     
@@ -30,12 +28,10 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         imageView.layer.cornerRadius = 20
         showLoadingIndicator()
         
-        presenter.viewController = self
+        presenter = MovieQuizPresenter(viewController: self)
         statisticService = StatisticService()
         alertPresenter = AlertPresenter()
-        questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
         
-        questionFactory?.loadData()
         
     }
     
@@ -45,22 +41,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     // MARK: - Public Methods
-    
-    // обрашаемся к методу фабрики вопросов для генерации вопросов
-    func didReceiveNextQuestion(question: QuizQuestion?) {
-        presenter.didReceiveNextQuestion(question: question)
-    }
-    
-    // обращение к методу для генерации вопроса
-    func didLoadDataFromServer() {
-        activityIndicator.isHidden = true
-        questionFactory?.requestNextQuestion()
-    }
-    
-    // перевод экрана в состояние ошибки
-    func didFailToLoadData(with error: Error) {
-        showNetworkError(message: error.localizedDescription)
-    }
     
     // MARK: - Private Methods
     
@@ -101,7 +81,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
                                     comletion: { [ weak self ] in
                                         guard let self = self else { return }
                                         self.presenter.restartGame()
-                                        questionFactory?.requestNextQuestion()
         })
         
         alertPresenter?.showAlert(view: self, model: alertModel)
@@ -118,24 +97,23 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self else { return }
-            self.presenter.questionFactory = self.questionFactory
             self.presenter.showNextQuestionOrResults()
         }
         
     }
     
     // функция включения индикатора загрузки
-    private func showLoadingIndicator() {
+    func showLoadingIndicator() {
         activityIndicator.isHidden = false
         activityIndicator.startAnimating()
     }
     
-    private func hideLoadingIndicator() {
+    func hideLoadingIndicator() {
         activityIndicator.isHidden = true
     }
     
     // функция показа алерта ошибки
-    private func showNetworkError( message: String) {
+    func showNetworkError( message: String) {
         hideLoadingIndicator()
         
         let alertErrorModel = AlertModel(title: "Ошибка",
@@ -144,7 +122,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
                                          comletion: { [ weak self ] in
                                          guard let self = self else { return }
                                          self.presenter.restartGame()
-                                         questionFactory?.requestNextQuestion()
         })
         
         alertPresenter?.showAlert(view: self, model: alertErrorModel)
