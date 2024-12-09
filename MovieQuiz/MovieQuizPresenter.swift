@@ -6,6 +6,9 @@
 import UIKit
 
 final class MovieQuizPresenter {
+    
+    var currentQuestion: QuizQuestion?
+    weak var viewController: MovieQuizViewController?
     //общее количество вопросов для квиза
     let questionsAmount: Int = 10
     // счетчик вопросов
@@ -32,4 +35,11 @@ final class MovieQuizPresenter {
         return questionStep
     }
     
+    func yesButtonClicked() {
+        guard let currentQuestion = currentQuestion else {
+            return
+        }
+        let givenAnswer = true
+        viewController?.showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+    }
 }
