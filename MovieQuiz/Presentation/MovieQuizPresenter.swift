@@ -9,11 +9,14 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     
     
     var currentQuestion: QuizQuestion?
+    private let statisticService: StatisticServiceProtocol!
     private weak var viewController: MovieQuizViewController?
-    var questionFactory: QuestionFactoryProtocol?
+    private var questionFactory: QuestionFactoryProtocol?
     
     init(viewController: MovieQuizViewController) {
         self.viewController = viewController
+        
+        statisticService = StatisticService()
         
         questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
         questionFactory?.loadData()
@@ -79,12 +82,6 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         didAnswer(isYes: false)
     }
     
-    func didAnswer(isCorrectAnswer: Bool) {
-        if isCorrectAnswer {
-            correctAnswers += 1
-        }
-    }
-    
     private func didAnswer(isYes: Bool) {
         
         guard let currentQuestion = currentQuestion else {
@@ -92,6 +89,29 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         }
         let givenAnswer = isYes
         viewController?.showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+    }
+    
+    func didAnswer(isCorrectAnswer: Bool) {
+        if isCorrectAnswer {
+            correctAnswers += 1
+        }
+    }
+    
+    func makeRezultMessage() -> String {
+        //данные в статиксервис для обновления данных и вычисления лучшего результата
+        statisticService.store(correct: correctAnswers, total: questionsAmount)
+        
+        let bestGame = statisticService.bestGame
+        
+        // данные в алерт для показа
+        let gameCount = "Количество сыгранных игр: \(statisticService.gamesCount)"
+        let gameRezult = "Ваш результат: \(correctAnswers)/\(questionsAmount)"
+        let bestGameInfo  = "Рекорд: \(bestGame.correct)/\(bestGame.total)" + " (\(bestGame.date.dateTimeString))"
+        let totalAccuracy = "Средняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%"
+        
+        let rezultMessage = [gameRezult, gameCount, bestGameInfo, totalAccuracy].joined(separator: "\n")
+        
+        return rezultMessage
     }
     
     // обрашаемся к методу фабрики вопросов для генерации вопросов

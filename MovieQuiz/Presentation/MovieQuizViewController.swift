@@ -15,8 +15,6 @@ final class MovieQuizViewController: UIViewController {
     
     // класс алерта
     private var alertPresenter: AlertPresenter?
-    // класс статиксервиса
-    private var statisticService: StatisticService?
     // класс презентер
     private var presenter: MovieQuizPresenter!
     
@@ -29,7 +27,6 @@ final class MovieQuizViewController: UIViewController {
         showLoadingIndicator()
         
         presenter = MovieQuizPresenter(viewController: self)
-        statisticService = StatisticService()
         alertPresenter = AlertPresenter()
         
         
@@ -57,23 +54,7 @@ final class MovieQuizViewController: UIViewController {
     
     // показ финального алерта
     func alertFinal() {
-        guard let statisticService = statisticService else { return }
-        
-        //данные в статиксервис для обновления данных и вычисления лучшего результата
-        statisticService.store(correct: presenter.correctAnswers, total: presenter.questionsAmount)
-        
-        // данные в алерт для показа
-        let gameCount = statisticService.gamesCount
-        let bestGame = statisticService.bestGame
-        let timeRecord = statisticService.bestGame.date
-        let totalAccuracy = "\(String(format: "%.2f", statisticService.totalAccuracy))%"
-        
-        let message = """
-        Ваш результат: \(presenter.correctAnswers)/\(presenter.questionsAmount)
-        Количество сыгранных игр: \(gameCount)
-        Рекорд: \(bestGame.correct)/\(bestGame.total) (\(timeRecord.dateTimeString))
-        Средняя точность: \(totalAccuracy)
-        """
+        let message = presenter.makeRezultMessage()
         
         let alertModel = AlertModel(title: "Этот раунд окончен!",
                                     message: message,
