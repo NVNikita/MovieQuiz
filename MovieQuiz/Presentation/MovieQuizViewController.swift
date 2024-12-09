@@ -7,7 +7,7 @@ final class MovieQuizViewController: UIViewController {
     @IBOutlet private var activityIndicator: UIActivityIndicatorView!
     @IBOutlet private var yesButton: UIButton!
     @IBOutlet private var noButton: UIButton!
-    @IBOutlet var imageView: UIImageView! // исправь исправь исправь !!!!!!!!!!!!!!!!
+    @IBOutlet private var imageView: UIImageView!
     @IBOutlet private var textLabel: UILabel!
     @IBOutlet private var counterLabel: UILabel!
     
@@ -28,8 +28,6 @@ final class MovieQuizViewController: UIViewController {
         
         presenter = MovieQuizPresenter(viewController: self)
         alertPresenter = AlertPresenter()
-        
-        
     }
     
     // статус бар
@@ -39,13 +37,13 @@ final class MovieQuizViewController: UIViewController {
     
     // MARK: - Public Methods
     
-    // MARK: - Private Methods
     
     // функция показа данных на экран
     func show(quiz step: QuizStepViewModel) {
         // делаем кнопки активными
         noButton.isEnabled = true
         yesButton.isEnabled = true
+        imageView.layer.borderColor = UIColor.clear.cgColor
         
         imageView.image = step.image
         textLabel.text = step.question
@@ -68,19 +66,13 @@ final class MovieQuizViewController: UIViewController {
     }
     
     // функция покраски рамки взависимости от ответа юзера
-    func showAnswerResult(isCorrect: Bool) {
+    func highlightImageBorder(isCorrect: Bool) {
         presenter.didAnswer(isCorrectAnswer: isCorrect)
         
         imageView.layer.masksToBounds = true
         imageView.layer.cornerRadius = 20
         imageView.layer.borderWidth = 8
         imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-            guard let self = self else { return }
-            self.presenter.showNextQuestionOrResults()
-        }
-        
     }
     
     // функция включения индикатора загрузки

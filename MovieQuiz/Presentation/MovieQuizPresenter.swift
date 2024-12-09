@@ -7,11 +7,14 @@ import UIKit
 
 final class MovieQuizPresenter: QuestionFactoryDelegate {
     
-    
-    var currentQuestion: QuizQuestion?
     private let statisticService: StatisticServiceProtocol!
     private weak var viewController: MovieQuizViewController?
     private var questionFactory: QuestionFactoryProtocol?
+    
+    private var currentQuestion: QuizQuestion?
+    private let questionsAmount: Int = 10
+    private var currentQuestionIndex: Int = 0
+    private var correctAnswers: Int = 0
     
     init(viewController: MovieQuizViewController) {
         self.viewController = viewController
@@ -44,12 +47,6 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
             self?.viewController?.show(quiz: viewModel)
         }
     }
-    
-    //общее количество вопросов для квиза
-    let questionsAmount: Int = 10
-    // счетчик вопросов
-    private var currentQuestionIndex: Int = 0
-    var correctAnswers: Int = 0
     
     func isLastQuestion() -> Bool {
         currentQuestionIndex == questionsAmount - 1
@@ -88,7 +85,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
             return
         }
         let givenAnswer = isYes
-        viewController?.showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+        proceedWithAnswer(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
     
     func didAnswer(isCorrectAnswer: Bool) {
@@ -114,6 +111,17 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         return rezultMessage
     }
     
+    private func proceedWithAnswer(isCorrect: Bool) {
+        didAnswer(isCorrectAnswer: isCorrect)
+        
+        viewController?.highlightImageBorder(isCorrect: isCorrect)
+            
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            guard let self = self else { return }
+            self.proceedToNextQuestionOrResults()
+        }
+    }
+    
     // обрашаемся к методу фабрики вопросов для генерации вопросов
     func didReceiveNextQuestion(question: QuizQuestion?) {
         guard let question = question else {
@@ -129,8 +137,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     }
     
     // функция переключения состояний
-    func showNextQuestionOrResults() {
-        viewController?.imageView.layer.borderWidth = 0
+    private func proceedToNextQuestionOrResults() {
         if self.isLastQuestion() {
             viewController?.alertFinal()
         } else {
