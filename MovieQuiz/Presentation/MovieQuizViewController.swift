@@ -67,8 +67,6 @@ final class MovieQuizViewController: UIViewController {
     
     // функция покраски рамки взависимости от ответа юзера
     func highlightImageBorder(isCorrect: Bool) {
-        presenter.didAnswer(isCorrectAnswer: isCorrect)
-        
         imageView.layer.masksToBounds = true
         imageView.layer.cornerRadius = 20
         imageView.layer.borderWidth = 8

@@ -7,6 +7,8 @@ import UIKit
 
 final class MovieQuizPresenter: QuestionFactoryDelegate {
     
+    // MARK: - Private Properties
+    
     private let statisticService: StatisticServiceProtocol!
     private weak var viewController: MovieQuizViewController?
     private var questionFactory: QuestionFactoryProtocol?
@@ -25,6 +27,8 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         questionFactory?.loadData()
         viewController.showLoadingIndicator()
     }
+    
+    // MARK: - Public Methods
     
     func didLoadDataFromServer() {
         viewController?.hideLoadingIndicator()
@@ -79,15 +83,6 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         didAnswer(isYes: false)
     }
     
-    private func didAnswer(isYes: Bool) {
-        
-        guard let currentQuestion = currentQuestion else {
-            return
-        }
-        let givenAnswer = isYes
-        proceedWithAnswer(isCorrect: givenAnswer == currentQuestion.correctAnswer)
-    }
-    
     func didAnswer(isCorrectAnswer: Bool) {
         if isCorrectAnswer {
             correctAnswers += 1
@@ -111,17 +106,6 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         return rezultMessage
     }
     
-    private func proceedWithAnswer(isCorrect: Bool) {
-        didAnswer(isCorrectAnswer: isCorrect)
-        
-        viewController?.highlightImageBorder(isCorrect: isCorrect)
-            
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-            guard let self = self else { return }
-            self.proceedToNextQuestionOrResults()
-        }
-    }
-    
     // обрашаемся к методу фабрики вопросов для генерации вопросов
     func didReceiveNextQuestion(question: QuizQuestion?) {
         guard let question = question else {
@@ -133,6 +117,28 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         
         DispatchQueue.main.async { [weak self] in
             self?.viewController?.show(quiz: viewModel)
+        }
+    }
+    
+    // MARK: - Private Methods
+    
+    private func didAnswer(isYes: Bool) {
+        guard let currentQuestion = currentQuestion else {
+            return
+        }
+        
+        let givenAnswer = isYes
+        proceedWithAnswer(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+    }
+    
+    private func proceedWithAnswer(isCorrect: Bool) {
+        didAnswer(isCorrectAnswer: isCorrect)
+        
+        viewController?.highlightImageBorder(isCorrect: isCorrect)
+            
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            guard let self = self else { return }
+            self.proceedToNextQuestionOrResults()
         }
     }
     
