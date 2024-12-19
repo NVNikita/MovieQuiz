@@ -100,7 +100,6 @@
 		EB3DD24E2D06AE7200435136 /* MovieQuizPresenterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieQuizPresenterTests.swift; sourceTree = "<group>"; };
 		EB3DD2592D06B32B00435136 /* MovieQuizPresenterTests1.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MovieQuizPresenterTests1.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		EB977BC62CFE177D001EE8FC /* MovieQuizTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MovieQuizTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		EB977BCF2CFE17EC001EE8FC /* MovieQuizTests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MovieQuizTests-Bridging-Header.h"; sourceTree = "<group>"; };
 		EB977BD02CFE17EC001EE8FC /* ArrayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrayTests.swift; sourceTree = "<group>"; };
 		EB977BD22CFE18DF001EE8FC /* MoviesLoaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoviesLoaderTests.swift; sourceTree = "<group>"; };
 		EBD5E16D2CE3B4CE00694538 /* QuestionFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionFactory.swift; sourceTree = "<group>"; };
@@ -254,7 +253,6 @@
 			isa = PBXGroup;
 			children = (
 				EB977BD02CFE17EC001EE8FC /* ArrayTests.swift */,
-				EB977BCF2CFE17EC001EE8FC /* MovieQuizTests-Bridging-Header.h */,
 				EB977BD22CFE18DF001EE8FC /* MoviesLoaderTests.swift */,
 			);
 			path = MovieQuizTests;
